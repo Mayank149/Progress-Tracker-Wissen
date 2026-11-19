@@ -14,23 +14,26 @@ import { ExternalAdminView } from "./external/admin-view.js";
 import { ZohoPreview } from "./zoho/zoho-view.js";
 
 class App {
+    static lastView = null;
+    static lastUserId = null;
+
     static async init() {
         console.log("Initializing Employee Course Progress Management System UI...");
 
         // 1. Initialize Top Demo Toggle Switcher
         this.setupDemoSwitcher();
 
-        // 2. Check Backend Health
-        await this.checkBackendStatus();
-        setInterval(() => this.checkBackendStatus(), 10000); // Check every 10s
-
-        // 3. Subscribe to reactive state updates
+        // 2. Subscribe to reactive state updates
         store.subscribe((state) => {
             this.handleStateChange(state);
         });
 
-        // 4. Initial Render of current view
+        // 3. Initial Render of current view
         this.renderCurrentView();
+
+        // 4. Initial Health Check & lightweight status polling (updates only indicator dot)
+        await this.checkBackendStatus();
+        setInterval(() => this.checkBackendStatus(), 15000);
     }
 
     /**
@@ -41,12 +44,14 @@ class App {
         const btnExternal = document.getElementById("btn-toggle-external");
 
         btnZoho.addEventListener("click", () => {
+            if (store.getState().currentDemoView === "zoho") return;
             btnZoho.classList.add("active");
             btnExternal.classList.remove("active");
             store.setState({ currentDemoView: "zoho" });
         });
 
         btnExternal.addEventListener("click", () => {
+            if (store.getState().currentDemoView === "external") return;
             btnExternal.classList.add("active");
             btnZoho.classList.remove("active");
             store.setState({ currentDemoView: "external" });
@@ -54,12 +59,11 @@ class App {
     }
 
     /**
-     * Checks if FastAPI is running on port 8000
+     * Checks if FastAPI is running on port 8000.
+     * Updates ONLY the DOM status pill without triggering a full-app re-render!
      */
     static async checkBackendStatus() {
         const isOnline = await ApiService.checkHealth();
-        store.setState({ isBackendConnected: isOnline });
-
         const statusEl = document.getElementById("backend-status");
         if (statusEl) {
             if (isOnline) {
@@ -73,9 +77,20 @@ class App {
     }
 
     /**
-     * Handles changes to global state
+     * Handles changes to global state.
+     * Guards against redundant re-rendering!
      */
     static handleStateChange(state) {
+        const currentUserId = state.currentUser ? state.currentUser.id : null;
+        
+        // If view and user identity have not changed, DO NOT re-render!
+        if (this.lastView === state.currentDemoView && this.lastUserId === currentUserId) {
+            return;
+        }
+
+        this.lastView = state.currentDemoView;
+        this.lastUserId = currentUserId;
+
         const viewExternal = document.getElementById("view-external");
         const viewZoho = document.getElementById("view-zoho");
 

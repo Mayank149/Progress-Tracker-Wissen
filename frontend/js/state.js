@@ -23,6 +23,15 @@ class StateManager {
     }
 
     setState(patch) {
+        let hasChanged = false;
+        for (const key in patch) {
+            if (this.state[key] !== patch[key]) {
+                hasChanged = true;
+                break;
+            }
+        }
+        if (!hasChanged) return;
+
         this.state = { ...this.state, ...patch };
         this.notify();
     }
