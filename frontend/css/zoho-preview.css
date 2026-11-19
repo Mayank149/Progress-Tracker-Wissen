@@ -1,0 +1,222 @@
+/* =========================================================
+   ZOHO NATIVE ECOSYSTEM PREVIEW STYLES
+   frontend/css/zoho-preview.css
+   Simulates native embedded Zoho People / Zoho Creator UI
+   ========================================================= */
+
+.zoho-workspace {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 65px);
+    background: #f4f5f8;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Zoho Global Top Suite Bar */
+.zoho-suite-header {
+    background: #003366; /* Zoho Suite Navy / Blue */
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.25rem;
+    height: 48px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.zoho-suite-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.zoho-logo-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+}
+
+.zoho-red { color: #f22f46; }
+.zoho-green { color: #009966; }
+.zoho-blue { color: #0077cc; }
+.zoho-yellow { color: #f5a623; }
+
+.zoho-app-title {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #cbd5e1;
+    border-left: 1px solid rgba(255, 255, 255, 0.25);
+    padding-left: 14px;
+}
+
+.zoho-suite-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.zoho-user-profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: #f1f5f9;
+}
+
+.zoho-user-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #0077cc;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Zoho Module Navigation Tabs */
+.zoho-module-nav {
+    background: #ffffff;
+    border-bottom: 1px solid #d9dfe7;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    height: 44px;
+}
+
+.zoho-nav-tabs {
+    display: flex;
+    gap: 20px;
+    height: 100%;
+}
+
+.zoho-tab-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.84rem;
+    font-weight: 500;
+    color: #4a5568;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    padding: 0 4px;
+    height: 100%;
+    transition: all var(--transition-fast);
+}
+
+.zoho-tab-link:hover {
+    color: #0077cc;
+}
+
+.zoho-tab-link.active {
+    color: #0077cc;
+    font-weight: 600;
+    border-bottom-color: #0077cc;
+}
+
+/* Zoho Main Content Layout */
+.zoho-body-container {
+    display: flex;
+    flex: 1;
+    padding: 1.5rem;
+    gap: 1.5rem;
+    max-width: 1380px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+/* Zoho Info Callout */
+.zoho-banner {
+    background: #eef6fc;
+    border-left: 4px solid #0077cc;
+    padding: 0.9rem 1.25rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    font-size: 0.85rem;
+    color: #204060;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.zoho-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.zoho-banner-icon {
+    font-size: 1.25rem;
+}
+
+/* Zoho Card / Section */
+.zoho-panel {
+    background: #ffffff;
+    border: 1px solid #d9dfe7;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 1.5rem;
+}
+
+.zoho-panel-header {
+    padding: 0.9rem 1.25rem;
+    border-bottom: 1px solid #edf1f6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.zoho-panel-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1a202c;
+}
+
+.zoho-panel-body {
+    padding: 1.25rem;
+}
+
+/* Zoho Progress Form Grid */
+.zoho-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+.zoho-btn-submit {
+    background: #0077cc;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    padding: 0.55rem 1.25rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 150ms ease;
+}
+
+.zoho-btn-submit:hover {
+    background: #005fa3;
+}
+
+/* Zoho Status Pills */
+.zoho-badge {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.zoho-badge.on-risk { background: #ffebee; color: #c62828; border: 1px solid #ffcdd2; }
+.zoho-badge.in-progress { background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; }
+.zoho-badge.completed { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+.zoho-badge.not-started { background: #f5f5f5; color: #616161; border: 1px solid #e0e0e0; }

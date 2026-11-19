@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Course Progress Management System | Implementation Comparison</title>
+    
+    <!-- Google Fonts for modern typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Modular CSS Stylesheets -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/external-dashboard.css">
+    <link rel="stylesheet" href="css/zoho-preview.css">
+</head>
+<body>
+
+    <!-- ======================================================== -->
+    <!-- TOP COMPARISON CONTROLLER (PERSISTENT HEADER)            -->
+    <!-- Switch between "Zoho Preview" and "External Dashboard"   -->
+    <!-- ======================================================== -->
+    <header id="top-demo-header">
+        <div class="header-branding">
+            <span class="brand-title">Employee Course Progress System</span>
+            <span class="brand-subtitle">Architecture & Implementation Preview</span>
+        </div>
+
+        <!-- Mode Toggle Switcher -->
+        <div class="demo-switcher" role="tablist" aria-label="Demo View Switcher">
+            <button id="btn-toggle-zoho" class="switcher-btn" data-target="zoho">
+                <span class="icon">🏢</span>
+                <span class="label">Zoho Preview</span>
+                <span class="badge">Native Simulation</span>
+            </button>
+            <button id="btn-toggle-external" class="switcher-btn active" data-target="external">
+                <span class="icon">🌐</span>
+                <span class="label">External Dashboard</span>
+                <span class="badge">Standalone App</span>
+            </button>
+        </div>
+
+        <!-- Backend Health & Active Role Indicator -->
+        <div class="header-status">
+            <div id="backend-status" class="status-indicator online">
+                <span class="dot"></span>
+                <span class="text">API Connected</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ======================================================== -->
+    <!-- VIEW CONTAINER 1: EXTERNAL DASHBOARD (CUSTOM WEB APP)    -->
+    <!-- ======================================================== -->
+    <main id="view-external" class="demo-viewport active">
+        <!-- Auth / Login View (Only on External Dashboard) -->
+        <section id="external-login-section" class="external-view-section">
+            <!-- Rendered by js/external/auth.js -->
+        </section>
+
+        <!-- Authenticated Dashboard View (Employee & Admin) -->
+        <section id="external-app-section" class="external-view-section hidden">
+            <!-- App Navigation Bar -->
+            <nav id="external-nav" class="external-navbar">
+                <!-- Rendered by js/external/nav.js -->
+            </nav>
+
+            <!-- Main Content Area -->
+            <div id="external-content" class="external-main-content">
+                <!-- Swapped between Employee View and Admin View -->
+            </div>
+        </section>
+    </main>
+
+    <!-- ======================================================== -->
+    <!-- VIEW CONTAINER 2: ZOHO PREVIEW (NATIVE ECOSYSTEM VIEW)   -->
+    <!-- ======================================================== -->
+    <main id="view-zoho" class="demo-viewport">
+        <!-- Zoho Application Shell (Auto-Authenticated Context) -->
+        <div id="zoho-app-container" class="zoho-workspace">
+            <!-- Rendered by js/zoho/zoho-shell.js -->
+        </div>
+    </main>
+
+    <!-- Global Toast / Notification Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Modular JavaScript (ES6 Modules) -->
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
