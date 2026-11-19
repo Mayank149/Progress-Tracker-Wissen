@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# SQLite Database (Crucial: never commit binary DB files to Git)
+*.db
+*.db-journal
+*.db-wal
+*.sqlite
+*.sqlite3
+backend/progress_tracker.db
+
+# VS Code & IDEs
+.vscode/*
+!.vscode/settings.json
+.idea/
+
+# OS generated
+.DS_Store
+Thumbs.db
