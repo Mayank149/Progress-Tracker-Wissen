@@ -9,10 +9,10 @@
 class StateManager {
     constructor() {
         this.state = {
-            currentDemoView: "external", // "external" or "zoho"
+            currentDemoView: "zoho",     // "zoho" or "external"
             currentUser: null,           // Authenticated user in External Dashboard
             zohoActiveEmployee: "EMP101",// Default employee simulated in Zoho
-            zohoActiveTab: "employee",   // "employee" or "admin" inside Zoho
+            zohoActiveTab: "activities", // "activities" or "admin" inside Zoho
             isBackendConnected: false
         };
         this.listeners = [];

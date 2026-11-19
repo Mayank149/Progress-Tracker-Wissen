@@ -153,7 +153,62 @@ def seed_database(db: Session = None):
             latest_comments="Reviewing curriculum prerequisites before beginning."
         )
 
-        db.add_all([asgn1, asgn2, asgn3, asgn4])
+        # Assignment 5: Alex Morgan - SAA-C03 (In Progress: 40%)
+        asgn5 = CourseAssignment(
+            employee_id=users[1].id, # Alex
+            course_id=courses[2].id, # SAA-C03
+            assigned_date=two_weeks_ago,
+            start_date=two_weeks_ago,
+            course_status="In Progress",
+            progress_percentage=40,
+            exam_date=date.today() + timedelta(days=25),
+            certification_name=courses[2].certification_name,
+            admin_status="In Progress",
+            latest_comments="Completed Cloud Architecture and IAM modules."
+        )
+
+        # Assignment 6: David Chen - GES-C02 (In Progress: 50%)
+        asgn6 = CourseAssignment(
+            employee_id=users[2].id, # David
+            course_id=courses[1].id, # GES-C02
+            assigned_date=two_weeks_ago,
+            start_date=two_weeks_ago,
+            course_status="In Progress",
+            progress_percentage=50,
+            exam_date=date.today() + timedelta(days=18),
+            certification_name=courses[1].certification_name,
+            admin_status="In Progress",
+            latest_comments="Studying Bedrock and SageMaker JumpStart fundamentals."
+        )
+
+        # Assignment 7: Elena Rostova - SAA-C03 (Not Started: 0%)
+        asgn7 = CourseAssignment(
+            employee_id=users[3].id, # Elena
+            course_id=courses[2].id, # SAA-C03
+            assigned_date=one_week_ago,
+            course_status="Not Started",
+            progress_percentage=0,
+            exam_date=date.today() + timedelta(days=40),
+            certification_name=courses[2].certification_name,
+            admin_status="In Progress",
+            latest_comments="Registered for voucher; commencing modules next week."
+        )
+
+        # Assignment 8: Marcus Vance - COF-C03 (In Progress: 30%)
+        asgn8 = CourseAssignment(
+            employee_id=users[4].id, # Marcus
+            course_id=courses[0].id, # COF-C03
+            assigned_date=two_weeks_ago,
+            start_date=two_weeks_ago,
+            course_status="In Progress",
+            progress_percentage=30,
+            exam_date=date.today() + timedelta(days=30),
+            certification_name=courses[0].certification_name,
+            admin_status="In Progress",
+            latest_comments="Reviewing data warehousing concepts and SQL syntax."
+        )
+
+        db.add_all([asgn1, asgn2, asgn3, asgn4, asgn5, asgn6, asgn7, asgn8])
         db.flush()
 
         # ---------------------------------------------------------
