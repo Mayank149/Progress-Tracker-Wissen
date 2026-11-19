@@ -90,9 +90,9 @@ export class ZohoPreview {
                 <div class="zoho-sub-header">
                     <div class="zoho-sub-tabs">
                         <button class="zoho-sub-tab ${zohoActiveTab !== 'admin' ? 'active' : ''}" id="zoho-sub-overview">Overview</button>
-                        <button class="zoho-sub-tab ${zohoActiveTab === 'admin' ? 'active' : ''}" id="zoho-sub-dashboard" title="${isHrAdmin ? 'HR Centralized Training Grid' : 'Exclusively accessible to HR Administrators'}">
-                            Dashboard ${isHrAdmin ? '' : '<span style="font-size:0.65rem; color:#ef4444; margin-left:3px;">🔒 HR</span>'}
-                        </button>
+                        ${isHrAdmin ? `
+                            <button class="zoho-sub-tab ${zohoActiveTab === 'admin' ? 'active' : ''}" id="zoho-sub-dashboard" title="HR Centralized Training Grid">Dashboard</button>
+                        ` : ''}
                         <button class="zoho-sub-tab" id="zoho-sub-calendar">Calendar</button>
                     </div>
                     <div class="zoho-sub-actions">
@@ -360,46 +360,38 @@ export class ZohoPreview {
             await this.render(container);
         });
 
-        // Sub-tabs: Overview vs Dashboard (Restricted to HR)
+        // Sub-tabs: Overview vs Dashboard (Dashboard rendered exclusively for HR)
         const subOverview = container.querySelector("#zoho-sub-overview");
         const subDashboard = container.querySelector("#zoho-sub-dashboard");
 
-        subOverview.addEventListener("click", async () => {
-            subOverview.classList.add("active");
-            subDashboard.classList.remove("active");
-            store.setState({ zohoActiveTab: "activities" });
-            await this.renderCurrentTab(container);
-        });
+        if (subOverview) {
+            subOverview.addEventListener("click", async () => {
+                if (store.getState().zohoActiveTab === "activities") return;
+                subOverview.classList.add("active");
+                if (subDashboard) subDashboard.classList.remove("active");
+                store.setState({ zohoActiveTab: "activities" });
+                await this.renderCurrentTab(container);
+            });
+        }
 
-        subDashboard.addEventListener("click", async () => {
-            const isHr = store.getState().zohoActiveEmployee === "HR001";
-            if (!isHr) {
-                store.showToast("🔒 Access Restricted: The HR Centralized View is exclusively available to HR Administrators (Sarah Jenkins).", "error");
-                return;
-            }
-            subDashboard.classList.add("active");
-            subOverview.classList.remove("active");
-            store.setState({ zohoActiveTab: "admin" });
-            await this.renderCurrentTab(container);
-        });
+        if (subDashboard) {
+            subDashboard.addEventListener("click", async () => {
+                if (store.getState().zohoActiveTab === "admin") return;
+                subDashboard.classList.add("active");
+                if (subOverview) subOverview.classList.remove("active");
+                store.setState({ zohoActiveTab: "admin" });
+                await this.renderCurrentTab(container);
+            });
+        }
 
-        // Left sidebar navigation with access restriction
+        // Left sidebar navigation: smoothly updates active icon with ZERO POPUPS and ZERO FLICKER
         const sidebarItems = container.querySelectorAll(".zoho-sidebar-item");
         sidebarItems.forEach(btn => {
             btn.addEventListener("click", async () => {
                 const navTarget = btn.getAttribute("data-nav");
                 const isHr = store.getState().zohoActiveEmployee === "HR001";
 
-                if (navTarget === "lms" || navTarget === "reports") {
-                    if (!isHr) {
-                        store.showToast("🔒 Access Restricted: Organizational training records are exclusively accessible to HR Administrators (Sarah Jenkins).", "error");
-                        return;
-                    }
-                    store.setState({ zohoActiveTab: "admin" });
-                } else {
-                    store.setState({ zohoActiveTab: "activities" });
-                }
-
+                // Update active sidebar icon visually without touching main viewport
                 sidebarItems.forEach(i => {
                     i.classList.remove("active");
                     const iconWrap = i.querySelector(".zoho-sidebar-icon-wrap");
@@ -409,7 +401,27 @@ export class ZohoPreview {
                 const currentIcon = btn.querySelector(".zoho-sidebar-icon-wrap");
                 if (currentIcon) currentIcon.classList.add("active-icon");
 
-                await this.renderCurrentTab(container);
+                // If user clicks "home", smoothly return to activities if on admin tab
+                if (navTarget === "home") {
+                    if (store.getState().zohoActiveTab === "admin") {
+                        store.setState({ zohoActiveTab: "activities" });
+                        await this.renderCurrentTab(container);
+                    }
+                    return;
+                }
+
+                // If user clicks "lms" or "reports", only HR opens the centralized training grid
+                if (navTarget === "lms" || navTarget === "reports") {
+                    if (isHr && store.getState().zohoActiveTab !== "admin") {
+                        store.setState({ zohoActiveTab: "admin" });
+                        await this.renderCurrentTab(container);
+                    }
+                    // For employees: silent active icon toggle, no popups, no flicker
+                    return;
+                }
+
+                // For Leave Tracker, Timesheet, Holiday Calendar, Performance, Files, More:
+                // Silent active icon toggle with zero popups and zero flicker!
             });
         });
 
@@ -442,10 +454,9 @@ export class ZohoPreview {
         }
 
         if (zohoActiveTab === "admin") {
-            // Strict role guard: if an employee tries to access admin view, block and show activities
+            // Strict role guard: if an employee tries to access admin view, quietly route to activities
             if (!isHr) {
                 store.setState({ zohoActiveTab: "activities" });
-                store.showToast("🔒 Access Restricted: Exclusively available to HR Administrators.", "error");
                 await this.renderZohoActivitiesDashboard(viewport, zohoActiveEmployee);
                 return;
             }
@@ -563,9 +574,7 @@ export class ZohoPreview {
                                 <button class="zoho-act-tab active" data-act-tab="activities">Activities</button>
                                 <button class="zoho-act-tab" data-act-tab="feeds">Feeds</button>
                                 <button class="zoho-act-tab" data-act-tab="profile">Profile</button>
-                                <button class="zoho-act-tab" data-act-tab="approvals" title="${isHr ? 'HR Approvals' : 'Approvals (HR Only)'}">
-                                    Approvals ${isHr ? '' : '🔒'}
-                                </button>
+                                ${isHr ? '<button class="zoho-act-tab" data-act-tab="approvals">Approvals</button>' : ''}
                                 <button class="zoho-act-tab" data-act-tab="leave">Leave</button>
                                 <button class="zoho-act-tab" data-act-tab="attendance">Attendance</button>
                                 <button class="zoho-act-tab" data-act-tab="time-logs">Time Logs</button>
@@ -592,12 +601,14 @@ export class ZohoPreview {
                         <div class="zoho-card zoho-greeting-card">
                             <div class="zoho-greeting-left">
                                 <div class="zoho-wissen-badge">
-                                    <span class="wissen-text">WISSEN</span>
+                                    <div class="zoho-wissen-brand">
+                                        <span class="wissen-text">wissen</span>
+                                        <svg class="wissen-logo-svg" width="22" height="18" viewBox="0 0 24 18" fill="none">
+                                            <path d="M2 3 L6 15 L9 6 L12 15 L16 3" stroke="#002b49" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M7 3 L11 13 L14 5 L17 13 L21 3" stroke="#0077cc" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+                                        </svg>
+                                    </div>
                                     <span class="wissen-sub">TECHNOLOGY</span>
-                                    <svg class="wissen-logo-svg" width="30" height="24" viewBox="0 0 32 24">
-                                        <path d="M4 4 L10 20 L14 8 L18 20 L24 4" fill="none" stroke="#003366" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                                        <path d="M10 4 L14 14 L18 6 L22 14 L28 4" fill="none" stroke="#0077cc" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                                    </svg>
                                 </div>
                                 <div class="zoho-greeting-text">
                                     <h2 class="zoho-greeting-title">Good Morning ${firstName}</h2>
@@ -807,12 +818,10 @@ export class ZohoPreview {
                 const tabName = tab.getAttribute("data-act-tab");
 
                 if (tabName === "approvals") {
-                    if (!isHr) {
-                        store.showToast("🔒 Access Restricted: Corporate approvals and training audit are exclusively managed by HR Administrators (Sarah Jenkins).", "error");
-                        return;
+                    if (isHr) {
+                        store.setState({ zohoActiveTab: "admin" });
+                        this.renderCurrentTab(document.getElementById("zoho-app-container"));
                     }
-                    store.setState({ zohoActiveTab: "admin" });
-                    this.renderCurrentTab(document.getElementById("zoho-app-container"));
                     return;
                 }
 

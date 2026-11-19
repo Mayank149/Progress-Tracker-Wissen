@@ -681,41 +681,47 @@
     z-index: 2;
 }
 
-/* Stylized Wissen Technology Badge */
+/* Stylized Wissen Technology Badge - Clean, Non-overlapping Layout */
 .zoho-wissen-badge {
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 6px;
-    padding: 8px 12px;
-    display: flex;
+    padding: 7px 12px;
+    display: inline-flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     line-height: 1.1;
-    position: relative;
+    flex-shrink: 0;
+}
+
+.zoho-wissen-brand {
+    display: flex;
+    align-items: center;
+    gap: 7px;
 }
 
 .zoho-wissen-badge .wissen-text {
-    font-size: 0.82rem;
+    font-size: 0.95rem;
     font-weight: 800;
-    color: #002244;
-    letter-spacing: 0.06em;
-}
-
-.zoho-wissen-badge .wissen-sub {
-    font-size: 0.52rem;
-    font-weight: 700;
-    color: #64748b;
-    letter-spacing: 0.12em;
+    color: #0b1e36;
+    letter-spacing: -0.01em;
+    font-family: inherit;
+    line-height: 1;
 }
 
 .zoho-wissen-badge .wissen-logo-svg {
-    position: absolute;
-    right: 6px;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.9;
+    display: block;
+    flex-shrink: 0;
+}
+
+.zoho-wissen-badge .wissen-sub {
+    font-size: 0.48rem;
+    font-weight: 700;
+    color: #64748b;
+    letter-spacing: 0.16em;
+    margin-top: 2px;
 }
 
 .zoho-greeting-text {
