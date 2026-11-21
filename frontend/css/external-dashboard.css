@@ -1,7 +1,45 @@
 /* =========================================================
    EXTERNAL WEB DASHBOARD STYLES
    frontend/css/external-dashboard.css
+   Modern Corporate SaaS Theme with Wissen Corporate Background
    ========================================================= */
+
+/* ---------------------------------------------------------
+   0. External Viewport Container & Background Image
+   --------------------------------------------------------- */
+#view-external {
+    position: relative;
+    min-height: calc(100vh - 65px);
+    background-color: #0b172a;
+    background-image: 
+        linear-gradient(135deg, rgba(10, 25, 47, 0.78) 0%, rgba(15, 30, 58, 0.84) 100%),
+        url('../img/wissen-new-image.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    
+    /* Brand Accent Colors matching Wissen Theme */
+    --primary: #0066cc;
+    --primary-hover: #0052a3;
+    --primary-light: #eff6ff;
+    --primary-border: #93c5fd;
+}
+
+/* Subtle Ambient Glow for Extra Depth */
+#view-external::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at 50% 25%, rgba(0, 102, 204, 0.08) 0%, transparent 70%);
+    z-index: 0;
+}
+
+.external-view-section {
+    position: relative;
+    z-index: 1;
+}
 
 /* ---------------------------------------------------------
    1. Login Page Styling (Independent Auth Flow)
@@ -11,18 +49,32 @@
     align-items: center;
     justify-content: center;
     min-height: calc(100vh - 65px);
-    padding: 2rem;
-    background: radial-gradient(circle at 50% 10%, #eff6ff 0%, #f1f5f9 100%);
+    padding: 2.5rem 1.5rem;
+    background: transparent;
 }
 
 .auth-card {
-    background: #ffffff;
-    border: 1px solid var(--neutral-200);
-    border-radius: 14px;
-    padding: 2.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 16px;
+    padding: 2.75rem 2.5rem;
     width: 100%;
-    max-width: 440px;
-    box-shadow: var(--shadow-lg);
+    max-width: 460px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.38), 0 0 0 1px rgba(255, 255, 255, 0.25);
+    animation: authCardEnter 0.35s ease-out;
+}
+
+@keyframes authCardEnter {
+    from {
+        opacity: 0;
+        transform: translateY(14px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .auth-header {
@@ -31,25 +83,27 @@
 }
 
 .auth-icon {
-    font-size: 2.5rem;
+    font-size: 2.6rem;
     margin-bottom: 0.5rem;
+    display: inline-block;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .auth-title {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--neutral-900);
     letter-spacing: -0.02em;
 }
 
 .auth-subtitle {
-    font-size: 0.85rem;
+    font-size: 0.86rem;
     color: var(--neutral-500);
-    margin-top: 0.25rem;
+    margin-top: 0.3rem;
 }
 
 .demo-users-panel {
-    margin-top: 1.5rem;
+    margin-top: 1.75rem;
     padding-top: 1.25rem;
     border-top: 1px solid var(--neutral-200);
 }
@@ -58,26 +112,26 @@
     font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
-    color: var(--neutral-400);
+    color: var(--neutral-500);
     letter-spacing: 0.05em;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.85rem;
     text-align: center;
 }
 
 .demo-user-chips {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 7px;
 }
 
 .demo-chip-btn {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 8px 12px;
+    padding: 9px 13px;
     border: 1px solid var(--neutral-200);
-    border-radius: 8px;
-    background: var(--neutral-50);
+    border-radius: 9px;
+    background: rgba(248, 250, 252, 0.85);
     cursor: pointer;
     font-family: inherit;
     transition: all var(--transition-fast);
@@ -86,20 +140,22 @@
 
 .demo-chip-btn:hover {
     border-color: var(--primary);
-    background: var(--primary-light);
+    background: #f0f7ff;
+    transform: translateX(2px);
+    box-shadow: 0 2px 6px rgba(0, 102, 204, 0.12);
 }
 
 .demo-chip-name {
-    font-size: 0.82rem;
+    font-size: 0.84rem;
     font-weight: 600;
     color: var(--neutral-800);
 }
 
 .demo-chip-role {
     font-size: 0.7rem;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: 600;
 }
 
 .demo-chip-role.hr { background: #fee2e2; color: #991b1b; }
@@ -109,12 +165,18 @@
    2. External Application Layout & Navbar
    --------------------------------------------------------- */
 .external-navbar {
-    background: #ffffff;
-    border-bottom: 1px solid var(--neutral-200);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.6);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.75rem 2rem;
+    padding: 0.85rem 2.25rem;
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.12);
+    position: sticky;
+    top: 57px;
+    z-index: 100;
 }
 
 .nav-left {
@@ -125,11 +187,19 @@
 
 .nav-app-name {
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 1.1rem;
     color: var(--neutral-900);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+}
+
+.nav-app-logo {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    border-radius: 6px;
+    display: block;
 }
 
 .nav-tabs {
@@ -138,13 +208,13 @@
 }
 
 .nav-tab-btn {
-    padding: 6px 14px;
+    padding: 7px 15px;
     border: none;
-    border-radius: 6px;
+    border-radius: 7px;
     background: transparent;
     color: var(--neutral-600);
     font-family: inherit;
-    font-size: 0.85rem;
+    font-size: 0.86rem;
     font-weight: 500;
     cursor: pointer;
     transition: all var(--transition-fast);
@@ -174,16 +244,17 @@
 }
 
 .user-avatar {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary) 0%, #004b99 100%);
     color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.88rem;
+    box-shadow: 0 2px 6px rgba(0, 102, 204, 0.25);
 }
 
 .user-details {
@@ -192,7 +263,7 @@
 }
 
 .user-name {
-    font-size: 0.85rem;
+    font-size: 0.86rem;
     font-weight: 600;
     color: var(--neutral-900);
     line-height: 1.2;
@@ -206,9 +277,10 @@
 .btn-logout {
     border: 1px solid var(--neutral-200);
     background: #ffffff;
-    border-radius: 6px;
-    padding: 6px 12px;
+    border-radius: 7px;
+    padding: 7px 14px;
     font-size: 0.78rem;
+    font-weight: 500;
     color: var(--neutral-600);
     cursor: pointer;
     transition: all var(--transition-fast);
@@ -224,23 +296,38 @@
    3. Main Content Container & Metric Cards
    --------------------------------------------------------- */
 .external-main-content {
-    max-width: 1280px;
+    max-width: 1320px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: 2.25rem 2rem 4rem 2rem;
 }
 
-.page-header {
+.external-main-content .page-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.75rem;
+    margin-bottom: 2rem;
+    padding: 1.15rem 1.6rem;
+    background: rgba(15, 23, 42, 0.52);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 14px;
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.25);
 }
 
-.page-title {
-    font-size: 1.5rem;
+.external-main-content .page-title {
+    font-size: 1.65rem;
     font-weight: 700;
-    color: var(--neutral-900);
+    color: #ffffff;
     letter-spacing: -0.02em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.external-main-content .page-header p {
+    color: #e2e8f0 !important;
+    font-size: 0.88rem;
+    margin-top: 3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .page-actions {
@@ -248,85 +335,106 @@
     gap: 10px;
 }
 
+.page-actions .btn-outline {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-color: rgba(255, 255, 255, 0.7);
+    color: #0f172a;
+    font-weight: 600;
+}
+
+.page-actions .btn-outline:hover {
+    background: #ffffff;
+    border-color: #ffffff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 /* Metric / Stat Cards Grid */
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 1rem;
+    gap: 1.15rem;
     margin-bottom: 2rem;
 }
 
 .stat-card {
-    background: #ffffff;
-    border: 1px solid var(--neutral-200);
-    border-radius: 10px;
-    padding: 1.25rem;
-    box-shadow: var(--shadow-sm);
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 1.35rem;
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.18), 0 2px 6px -1px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform var(--transition-fast);
+    transition: all var(--transition-fast);
 }
 
 .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+    box-shadow: 0 14px 28px -4px rgba(0, 0, 0, 0.28);
+    border-color: rgba(255, 255, 255, 0.95);
 }
 
 .stat-card.risk-alert {
     border-color: #fca5a5;
-    background: #fff5f5;
+    background: rgba(254, 242, 242, 0.96);
+    box-shadow: 0 8px 24px -4px rgba(220, 38, 38, 0.15);
 }
 
 .stat-card.cert-highlight {
     border-color: #86efac;
-    background: #f0fdf4;
+    background: rgba(240, 253, 244, 0.96);
+    box-shadow: 0 8px 24px -4px rgba(22, 163, 74, 0.15);
 }
 
 .stat-label {
     font-size: 0.8rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--neutral-500);
     text-transform: uppercase;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
 }
 
 .stat-value {
-    font-size: 1.9rem;
+    font-size: 2rem;
     font-weight: 700;
     color: var(--neutral-900);
-    margin-top: 0.25rem;
+    margin-top: 0.35rem;
 }
 
 .stat-meta {
     font-size: 0.75rem;
     color: var(--neutral-500);
-    margin-top: 0.25rem;
+    margin-top: 0.35rem;
 }
 
 /* ---------------------------------------------------------
    4. Data Tables & Status Badges
    --------------------------------------------------------- */
 .card-container {
-    background: #ffffff;
-    border: 1px solid var(--neutral-200);
-    border-radius: 12px;
-    box-shadow: var(--shadow-sm);
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 14px;
+    box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.24);
     overflow: hidden;
     margin-bottom: 2rem;
 }
 
 .card-header-bar {
-    padding: 1.1rem 1.5rem;
+    padding: 1.15rem 1.6rem;
     border-bottom: 1px solid var(--neutral-200);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.9);
 }
 
 .card-header-title {
-    font-size: 1.05rem;
+    font-size: 1.08rem;
     font-weight: 600;
     color: var(--neutral-900);
 }
@@ -338,11 +446,19 @@
 }
 
 .search-input {
-    padding: 0.5rem 0.8rem;
+    padding: 0.55rem 0.85rem;
     border: 1px solid var(--neutral-300);
-    border-radius: 6px;
+    border-radius: 7px;
     font-size: 0.82rem;
     width: 220px;
+    background: #ffffff;
+    transition: all var(--transition-fast);
+}
+
+.search-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.15);
+    outline: none;
 }
 
 .table-responsive {
@@ -357,23 +473,27 @@
 }
 
 .data-table th {
-    background: var(--neutral-50);
-    padding: 0.85rem 1.25rem;
+    background: #f8fafc;
+    padding: 0.95rem 1.25rem;
     font-weight: 600;
-    color: var(--neutral-600);
+    color: var(--neutral-700);
     border-bottom: 1px solid var(--neutral-200);
     white-space: nowrap;
 }
 
 .data-table td {
-    padding: 0.95rem 1.25rem;
+    padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--neutral-200);
     color: var(--neutral-800);
     vertical-align: middle;
 }
 
+.data-table tbody tr {
+    transition: background-color var(--transition-fast);
+}
+
 .data-table tbody tr:hover {
-    background-color: var(--neutral-50);
+    background-color: rgba(241, 245, 249, 0.85);
 }
 
 /* Status Badges */
@@ -430,13 +550,15 @@
     min-width: 34px;
 }
 
-/* Buttons */
+/* ---------------------------------------------------------
+   5. Buttons & Interactive Controls
+   --------------------------------------------------------- */
 .btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 0.55rem 1.1rem;
-    border-radius: 6px;
+    padding: 0.58rem 1.15rem;
+    border-radius: 7px;
     font-size: 0.85rem;
     font-weight: 500;
     font-family: inherit;
@@ -448,10 +570,13 @@
 .btn-primary {
     background: var(--primary);
     color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 102, 204, 0.25);
 }
 
 .btn-primary:hover {
     background: var(--primary-hover);
+    box-shadow: 0 4px 12px rgba(0, 102, 204, 0.35);
+    transform: translateY(-1px);
 }
 
 .btn-outline {
@@ -475,6 +600,16 @@
 }
 
 .btn-sm {
-    padding: 0.35rem 0.75rem;
+    padding: 0.38rem 0.8rem;
     font-size: 0.78rem;
+}
+
+/* External Modal Elevation */
+#view-external ~ #track-modal-container .modal-card,
+#view-external ~ #admin-modal-container .modal-card,
+#view-external .modal-card {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 16px;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.8);
 }

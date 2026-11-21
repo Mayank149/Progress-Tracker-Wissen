@@ -143,8 +143,8 @@ class App {
         navEl.innerHTML = `
             <div class="nav-left">
                 <div class="nav-app-name">
-                    <span style="font-size: 1.25rem;">🎓</span>
-                    <span>Course Tracker Portal</span>
+                    <img src="img/logo-wissen.jpg" alt="Wissen Logo" class="nav-app-logo" />
+                    <span>Wissen Course Tracker</span>
                 </div>
                 <div class="nav-tabs">
                     ${user.role === 'hr_admin' ? `

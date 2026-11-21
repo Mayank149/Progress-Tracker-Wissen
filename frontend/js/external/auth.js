@@ -15,7 +15,7 @@ export class ExternalAuth {
             <div class="auth-wrapper">
                 <div class="auth-card">
                     <div class="auth-header">
-                        <div class="auth-icon">🌐</div>
+                        <div style="display: inline-block; padding: 4px 14px; background: rgba(0, 102, 204, 0.08); color: #0066cc; border: 1px solid rgba(0, 102, 204, 0.2); border-radius: 9999px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 0.75rem;">Wissen Technology</div>
                         <h1 class="auth-title">Corporate Portal Login</h1>
                         <p class="auth-subtitle">Employee Course Progress Management System</p>
                     </div>
