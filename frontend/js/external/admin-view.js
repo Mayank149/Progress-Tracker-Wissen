@@ -97,13 +97,13 @@ export class ExternalAdminView {
                     </div>
                 </div>
 
-                <!-- Table 1: Course Enrollments -->
+                <!-- Table 1: Course Enrollments (Grouped by unique employee with course dropdown) -->
                 <div id="section-enrollments" class="table-responsive">
                     <table class="data-table">
                         <thead>
                             <tr>
                                 <th>Employee</th>
-                                <th>Course</th>
+                                <th style="min-width: 230px;">Course (Select Course)</th>
                                 <th>Progress %</th>
                                 <th>Course Status</th>
                                 <th>HR Status</th>
@@ -111,7 +111,7 @@ export class ExternalAdminView {
                                 <th>Certified Date</th>
                                 <th>Week 1</th>
                                 <th>Week 2</th>
-                                <th>Actions</th>
+                                <th style="text-align: center;">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="admin-assignments-tbody">
@@ -125,17 +125,15 @@ export class ExternalAdminView {
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Timestamp</th>
-                                <th>Admin Identity</th>
-                                <th>Assignment ID</th>
-                                <th>Field Modified</th>
-                                <th>Original Value</th>
-                                <th>Updated Value</th>
+                                <th style="width: 170px;">Timestamp</th>
+                                <th style="width: 160px;">Admin Identity</th>
+                                <th style="width: 110px;">Assignment</th>
+                                <th>Changes Recorded</th>
                                 <th>Modification Reason</th>
                             </tr>
                         </thead>
                         <tbody id="admin-audit-tbody">
-                            <tr><td colspan="7" style="text-align: center; padding: 2rem;">Loading audit trail...</td></tr>
+                            <tr><td colspan="5" style="text-align: center; padding: 2rem;">Loading audit trail...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -182,53 +180,173 @@ export class ExternalAdminView {
                 return;
             }
 
-            tbody.innerHTML = assignments.map(a => {
-                const statusClass = a.course_status.toLowerCase().replace(" ", "-");
-                const adminStatusClass = a.admin_status.toLowerCase().replace(" ", "-");
-                
-                // Extract Week 1 & Week 2
-                let w1 = "-";
-                let w2 = "-";
-                if (a.progress_history) {
-                    const sorted = [...a.progress_history].sort((x, y) => new Date(x.timestamp) - new Date(y.timestamp));
-                    for (const h of sorted) {
-                        if (h.reporting_period.toLowerCase().includes("week 1") && w1 === "-") w1 = `${h.progress_percentage}%`;
-                        if (h.reporting_period.toLowerCase().includes("week 2") && w2 === "-") w2 = `${h.progress_percentage}%`;
-                    }
+            // Group assignments by unique employee so an employee is listed once (not in multiple rows)
+            const employeeMap = new Map();
+            for (const a of assignments) {
+                const empId = a.employee ? a.employee.employee_id : "UNKNOWN";
+                if (!employeeMap.has(empId)) {
+                    employeeMap.set(empId, {
+                        employee: a.employee,
+                        assignments: []
+                    });
                 }
+                employeeMap.get(empId).assignments.push(a);
+            }
+
+            const uniqueEmployees = Array.from(employeeMap.values());
+
+            tbody.innerHTML = uniqueEmployees.map(empData => {
+                const emp = empData.employee;
+                const empId = emp ? emp.employee_id : "";
+                const firstAsgn = empData.assignments[0];
 
                 return `
-                    <tr>
+                    <tr id="ext-row-emp-${empId}" data-emp-id="${empId}">
                         <td>
-                            <strong>${a.employee ? a.employee.name : 'N/A'}</strong>
-                            <div style="font-size: 0.72rem; color: var(--neutral-500);">${a.employee ? a.employee.employee_id : ''} • ${a.employee ? a.employee.email : ''}</div>
+                            <strong>${emp ? emp.name : 'N/A'}</strong>
+                            <div style="font-size: 0.72rem; color: var(--neutral-500);">${empId} • ${emp ? emp.email : ''}</div>
                         </td>
                         <td>
-                            <strong>${a.course ? a.course.course_code : ''}</strong>
-                            <div style="font-size: 0.72rem; color: var(--neutral-500);">${a.course ? a.course.course_name : ''}</div>
+                            <select class="ext-table-course-select form-select" data-emp-id="${empId}" style="width: 100%; max-width: 260px; padding: 4px 8px; font-size: 0.78rem; font-weight: 600; cursor: pointer;">
+                                ${empData.assignments.map(a => `
+                                    <option value="${a.id}" ${a.id === firstAsgn.id ? 'selected' : ''}>
+                                        ${a.course ? a.course.course_code : 'Course'} - ${a.course ? a.course.course_name : a.certification_name} (${a.progress_percentage}%)
+                                    </option>
+                                `).join("")}
+                            </select>
                         </td>
-                        <td>
-                            <div class="progress-bar-wrapper">
-                                <div class="progress-track" style="width: 80px;">
-                                    <div class="progress-fill ${a.course_status === 'Completed' ? 'completed' : ''}" style="width: ${a.progress_percentage}%;"></div>
-                                </div>
-                                <span class="progress-text">${a.progress_percentage}%</span>
-                            </div>
+                        <td class="ext-cell-progress">
+                            <!-- Filled dynamically -->
                         </td>
-                        <td><span class="status-pill ${statusClass}">${a.course_status}</span></td>
-                        <td><span class="status-pill ${adminStatusClass}">${a.admin_status}</span></td>
-                        <td>${a.exam_date || '<span style="color: var(--neutral-400);">-</span>'}</td>
-                        <td>${a.certified_date || '<span style="color: var(--neutral-400);">-</span>'}</td>
-                        <td>${w1}</td>
-                        <td>${w2}</td>
-                        <td>
-                            <button class="btn btn-outline btn-sm btn-edit-asgn" data-id="${a.id}">
+                        <td class="ext-cell-course-status">
+                            <!-- Filled dynamically -->
+                        </td>
+                        <td class="ext-cell-admin-status">
+                            <!-- Filled dynamically -->
+                        </td>
+                        <td class="ext-cell-exam-date">
+                            <!-- Filled dynamically -->
+                        </td>
+                        <td class="ext-cell-cert-date">
+                            <!-- Filled dynamically -->
+                        </td>
+                        <td class="ext-cell-week-1">
+                            <!-- Filled dynamically -->
+                        </td>
+                        <td class="ext-cell-week-2">
+                            <!-- Filled dynamically -->
+                        </td>
+                        <td style="text-align: center;">
+                            <button class="btn btn-outline btn-sm btn-edit-asgn" data-id="${firstAsgn.id}" data-emp-id="${empId}">
                                 ✏️ Verify / Edit
                             </button>
                         </td>
                     </tr>
                 `;
             }).join("");
+
+            // Helper to update a row's details for a given assignment
+            const updateRowForAssignment = (rowEl, asgn) => {
+                if (!rowEl || !asgn) return;
+
+                // Update the Verify/Edit button's target assignment id
+                const btnEdit = rowEl.querySelector(".btn-edit-asgn");
+                if (btnEdit) {
+                    btnEdit.setAttribute("data-id", asgn.id);
+                }
+
+                // 1. Progress
+                const cellProgress = rowEl.querySelector(".ext-cell-progress");
+                if (cellProgress) {
+                    const isComplete = asgn.course_status === "Completed";
+                    cellProgress.innerHTML = `
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-track" style="width: 80px;">
+                                <div class="progress-fill ${isComplete ? 'completed' : ''}" style="width: ${asgn.progress_percentage || 0}%;"></div>
+                            </div>
+                            <span class="progress-text">${asgn.progress_percentage || 0}%</span>
+                        </div>
+                    `;
+                }
+
+                // 2. Course Status
+                const cellCourseStatus = rowEl.querySelector(".ext-cell-course-status");
+                if (cellCourseStatus) {
+                    const st = asgn.course_status || "Not Started";
+                    cellCourseStatus.innerHTML = `
+                        <span class="status-pill ${st.toLowerCase().replace(' ', '-')}">${st}</span>
+                    `;
+                }
+
+                // 3. Admin Status
+                const cellAdminStatus = rowEl.querySelector(".ext-cell-admin-status");
+                if (cellAdminStatus) {
+                    const ast = asgn.admin_status || "In Progress";
+                    const badgeClass = ast === "On Risk" ? "on-risk" : (ast === "Certified" ? "certified" : "in-progress");
+                    cellAdminStatus.innerHTML = `
+                        <span class="status-pill ${badgeClass}">
+                            ${ast === "On Risk" ? '⚠️ ' : ''}${ast}
+                        </span>
+                    `;
+                }
+
+                // 4. Planned Exam
+                const cellExam = rowEl.querySelector(".ext-cell-exam-date");
+                if (cellExam) {
+                    cellExam.innerHTML = asgn.exam_date ? asgn.exam_date : `<span style="color: var(--neutral-400);">-</span>`;
+                }
+
+                // 5. Certified Date
+                const cellCert = rowEl.querySelector(".ext-cell-cert-date");
+                if (cellCert) {
+                    cellCert.innerHTML = asgn.certified_date ? asgn.certified_date : `<span style="color: var(--neutral-400);">-</span>`;
+                }
+
+                // 6. Week 1 and Week 2
+                let w1 = "-";
+                let w2 = "-";
+                if (asgn.progress_history) {
+                    for (const h of asgn.progress_history) {
+                        if (h.reporting_period && h.reporting_period.toLowerCase().includes("week 1") && w1 === "-") {
+                            w1 = `${h.progress_percentage}%`;
+                        }
+                        if (h.reporting_period && h.reporting_period.toLowerCase().includes("week 2") && w2 === "-") {
+                            w2 = `${h.progress_percentage}%`;
+                        }
+                    }
+                }
+                const cellW1 = rowEl.querySelector(".ext-cell-week-1");
+                if (cellW1) cellW1.textContent = w1;
+
+                const cellW2 = rowEl.querySelector(".ext-cell-week-2");
+                if (cellW2) cellW2.textContent = w2;
+            };
+
+            // Initialize each unique employee row with their first course
+            uniqueEmployees.forEach(empData => {
+                const empId = empData.employee ? empData.employee.employee_id : "";
+                const row = container.querySelector(`#ext-row-emp-${empId}`);
+                if (row && empData.assignments.length > 0) {
+                    updateRowForAssignment(row, empData.assignments[0]);
+                }
+            });
+
+            // Listen for course selection changes within each employee row
+            const courseSelects = container.querySelectorAll(".ext-table-course-select");
+            courseSelects.forEach(sel => {
+                sel.addEventListener("change", (e) => {
+                    const selectedAsgnId = parseInt(e.target.value);
+                    const empId = sel.getAttribute("data-emp-id");
+                    const empData = employeeMap.get(empId);
+                    if (empData) {
+                        const asgn = empData.assignments.find(a => a.id === selectedAsgnId);
+                        const row = container.querySelector(`#ext-row-emp-${empId}`);
+                        if (asgn && row) {
+                            updateRowForAssignment(row, asgn);
+                        }
+                    }
+                });
+            });
 
             // Attach inline edit handlers
             tbody.querySelectorAll(".btn-edit-asgn").forEach(btn => {
@@ -249,22 +367,78 @@ export class ExternalAdminView {
         try {
             const logs = await ApiService.getAuditLogs();
             const tbody = container.querySelector("#admin-audit-tbody");
-            if (logs.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: var(--neutral-500);">No administrative changes recorded yet.</td></tr>`;
+            if (!logs || logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--neutral-500);">No administrative changes recorded yet.</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = logs.map(l => `
-                <tr>
-                    <td style="font-size: 0.78rem; color: var(--neutral-600);">${new Date(l.timestamp).toLocaleString()}</td>
-                    <td><strong>${l.administrator_name}</strong> <span style="font-size: 0.72rem; color: var(--neutral-500);">(${l.administrator_id})</span></td>
-                    <td>#${l.assignment_id}</td>
-                    <td><code>${l.field_name}</code></td>
-                    <td><span style="color: var(--neutral-500); text-decoration: line-through;">${l.original_value || 'None'}</span></td>
-                    <td><strong style="color: var(--primary);">${l.updated_value || 'None'}</strong></td>
-                    <td style="max-width: 250px; font-size: 0.8rem; color: var(--neutral-700);">${l.reason || ''}</td>
-                </tr>
-            `).join("");
+            // Group audit logs by update event (same assignment, admin, reason, and close timestamp)
+            const groups = [];
+            for (const log of logs) {
+                const timeMs = new Date(log.timestamp).getTime();
+                let existing = groups.find(g => 
+                    g.assignment_id === log.assignment_id &&
+                    g.administrator_id === log.administrator_id &&
+                    g.reason === log.reason &&
+                    Math.abs(g.timeMs - timeMs) < 4000
+                );
+                if (!existing) {
+                    existing = {
+                        timeMs,
+                        timestamp: log.timestamp,
+                        administrator_name: log.administrator_name,
+                        administrator_id: log.administrator_id,
+                        assignment_id: log.assignment_id,
+                        reason: log.reason,
+                        changes: []
+                    };
+                    groups.push(existing);
+                }
+                existing.changes.push({
+                    field_name: log.field_name,
+                    original_value: log.original_value,
+                    updated_value: log.updated_value
+                });
+            }
+
+            tbody.innerHTML = groups.map(g => {
+                const changesHtml = g.changes.map(c => {
+                    const orig = (c.original_value !== null && c.original_value !== undefined && c.original_value !== '') ? c.original_value : 'None';
+                    const upd = (c.updated_value !== null && c.updated_value !== undefined && c.updated_value !== '') ? c.updated_value : 'None';
+                    const origDisplay = c.field_name === 'progress_percentage' ? `${orig}%` : orig;
+                    const updDisplay = c.field_name === 'progress_percentage' ? `${upd}%` : upd;
+
+                    return `
+                        <div style="margin-bottom: 5px; font-size: 0.82rem; line-height: 1.4;">
+                            <span style="font-family: monospace; font-size: 0.76rem; background: var(--neutral-100); color: var(--neutral-800); padding: 2px 6px; border-radius: 4px; font-weight: 600;">${c.field_name}</span>: 
+                            <span style="color: var(--neutral-400); text-decoration: line-through; margin-left: 4px;">${origDisplay}</span>
+                            <span style="color: var(--neutral-500); margin: 0 4px;">&rarr;</span>
+                            <strong style="color: var(--primary);">${updDisplay}</strong>
+                        </div>
+                    `;
+                }).join("");
+
+                return `
+                    <tr>
+                        <td style="font-size: 0.8rem; color: var(--neutral-600); white-space: nowrap; vertical-align: top;">
+                            ${new Date(g.timestamp).toLocaleString()}
+                        </td>
+                        <td style="vertical-align: top;">
+                            <strong>${g.administrator_name}</strong>
+                            <span style="font-size: 0.72rem; color: var(--neutral-500); display: block;">(${g.administrator_id})</span>
+                        </td>
+                        <td style="vertical-align: top;">
+                            <code>#${g.assignment_id}</code>
+                        </td>
+                        <td style="vertical-align: top;">
+                            ${changesHtml}
+                        </td>
+                        <td style="max-width: 250px; font-size: 0.82rem; color: var(--neutral-700); vertical-align: top;">
+                            ${g.reason || '-'}
+                        </td>
+                    </tr>
+                `;
+            }).join("");
         } catch (err) {
             store.showToast("Failed to load audit logs", "error");
         }

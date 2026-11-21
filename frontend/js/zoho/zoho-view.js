@@ -1122,17 +1122,15 @@ export class ZohoPreview {
                             <table class="data-table">
                                 <thead>
                                     <tr>
-                                        <th>Timestamp</th>
-                                        <th>Admin Identity</th>
-                                        <th>Assignment ID</th>
-                                        <th>Field Modified</th>
-                                        <th>Original Value</th>
-                                        <th>Updated Value</th>
+                                        <th style="width: 170px;">Timestamp</th>
+                                        <th style="width: 160px;">Admin Identity</th>
+                                        <th style="width: 110px;">Assignment</th>
+                                        <th>Changes Recorded</th>
                                         <th>Modification Reason</th>
                                     </tr>
                                 </thead>
                                 <tbody id="zoho-admin-audit-tbody">
-                                    <tr><td colspan="7" style="text-align: center; padding: 2rem; color: #64748b;">Loading audit trail...</td></tr>
+                                    <tr><td colspan="5" style="text-align: center; padding: 2rem; color: #64748b;">Loading audit trail...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1348,32 +1346,85 @@ export class ZohoPreview {
                 });
             }
 
-            // Function to load and render Zoho Audit Logs table
+            // Function to load and render Zoho Audit Logs table grouped cleanly by event
             const loadZohoAuditLogs = async () => {
                 const tbody = viewport.querySelector("#zoho-admin-audit-tbody");
                 try {
                     const logs = await ApiService.getAuditLogs();
                     if (!logs || logs.length === 0) {
-                        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #64748b;">No administrative modifications logged yet.</td></tr>`;
+                        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 2rem; color: #64748b;">No administrative modifications logged yet.</td></tr>`;
                         return;
                     }
 
-                    tbody.innerHTML = logs.map(l => `
-                        <tr>
-                            <td style="font-size: 0.78rem; color: #64748b; white-space: nowrap;">${new Date(l.timestamp).toLocaleString()}</td>
-                            <td>
-                                <strong>${l.administrator_name}</strong>
-                                <span style="font-size: 0.72rem; color: #64748b; display: block;">(${l.administrator_id})</span>
-                            </td>
-                            <td><code>#${l.assignment_id}</code></td>
-                            <td><span style="font-family: monospace; font-size: 0.78rem; background: #f1f5f9; padding: 2px 6px; border-radius: 3px;">${l.field_name}</span></td>
-                            <td><span style="color: #64748b; text-decoration: line-through;">${l.original_value !== null && l.original_value !== undefined ? l.original_value : 'None'}</span></td>
-                            <td><strong style="color: #0077cc;">${l.updated_value !== null && l.updated_value !== undefined ? l.updated_value : 'None'}</strong></td>
-                            <td style="max-width: 250px; font-size: 0.8rem; color: #334155;">${l.reason || '-'}</td>
-                        </tr>
-                    `).join("");
+                    // Group audit logs by update event (same assignment, admin, reason, and close timestamp)
+                    const groups = [];
+                    for (const log of logs) {
+                        const timeMs = new Date(log.timestamp).getTime();
+                        let existing = groups.find(g => 
+                            g.assignment_id === log.assignment_id &&
+                            g.administrator_id === log.administrator_id &&
+                            g.reason === log.reason &&
+                            Math.abs(g.timeMs - timeMs) < 4000
+                        );
+                        if (!existing) {
+                            existing = {
+                                timeMs,
+                                timestamp: log.timestamp,
+                                administrator_name: log.administrator_name,
+                                administrator_id: log.administrator_id,
+                                assignment_id: log.assignment_id,
+                                reason: log.reason,
+                                changes: []
+                            };
+                            groups.push(existing);
+                        }
+                        existing.changes.push({
+                            field_name: log.field_name,
+                            original_value: log.original_value,
+                            updated_value: log.updated_value
+                        });
+                    }
+
+                    tbody.innerHTML = groups.map(g => {
+                        const changesHtml = g.changes.map(c => {
+                            const orig = (c.original_value !== null && c.original_value !== undefined && c.original_value !== '') ? c.original_value : 'None';
+                            const upd = (c.updated_value !== null && c.updated_value !== undefined && c.updated_value !== '') ? c.updated_value : 'None';
+                            const origDisplay = c.field_name === 'progress_percentage' ? `${orig}%` : orig;
+                            const updDisplay = c.field_name === 'progress_percentage' ? `${upd}%` : upd;
+
+                            return `
+                                <div style="margin-bottom: 5px; font-size: 0.8rem; line-height: 1.4;">
+                                    <span style="font-family: monospace; font-size: 0.76rem; background: #f1f5f9; color: #334155; padding: 2px 6px; border-radius: 3px; font-weight: 600;">${c.field_name}</span>: 
+                                    <span style="color: #94a3b8; text-decoration: line-through; margin-left: 4px;">${origDisplay}</span>
+                                    <span style="color: #64748b; margin: 0 4px;">&rarr;</span>
+                                    <strong style="color: #0077cc;">${updDisplay}</strong>
+                                </div>
+                            `;
+                        }).join("");
+
+                        return `
+                            <tr>
+                                <td style="font-size: 0.78rem; color: #64748b; white-space: nowrap; vertical-align: top;">
+                                    ${new Date(g.timestamp).toLocaleString()}
+                                </td>
+                                <td style="vertical-align: top;">
+                                    <strong>${g.administrator_name}</strong>
+                                    <span style="font-size: 0.72rem; color: #64748b; display: block;">(${g.administrator_id})</span>
+                                </td>
+                                <td style="vertical-align: top;">
+                                    <code>#${g.assignment_id}</code>
+                                </td>
+                                <td style="vertical-align: top;">
+                                    ${changesHtml}
+                                </td>
+                                <td style="max-width: 250px; font-size: 0.8rem; color: #334155; vertical-align: top;">
+                                    ${g.reason || '-'}
+                                </td>
+                            </tr>
+                        `;
+                    }).join("");
                 } catch (err) {
-                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 2rem;">Failed to fetch audit records.</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #ef4444; padding: 2rem;">Failed to fetch audit records.</td></tr>`;
                 }
             };
 
