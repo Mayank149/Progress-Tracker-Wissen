@@ -6,12 +6,12 @@
  * =========================================================
  */
 
-import ApiService from "./api.js";
-import { store } from "./state.js";
-import { ExternalAuth } from "./external/auth.js";
-import { ExternalEmployeeView } from "./external/employee-view.js";
-import { ExternalAdminView } from "./external/admin-view.js";
-import { ZohoPreview } from "./zoho/zoho-view.js";
+import ApiService from "./api.js?v=2.2";
+import { store } from "./state.js?v=2.2";
+import { ExternalAuth } from "./external/auth.js?v=2.2";
+import { ExternalEmployeeView } from "./external/employee-view.js?v=2.2";
+import { ExternalAdminView } from "./external/admin-view.js?v=2.2";
+import { ZohoPreview } from "./zoho/zoho-view.js?v=2.2";
 
 class App {
     static lastView = null;

@@ -41,7 +41,7 @@ app = FastAPI(
 )
 
 # ---------------------------------------------------------
-# CORS Configuration (Allows frontend React app to connect)
+# CORS & Cache-Control Configuration
 # ---------------------------------------------------------
 app.add_middleware(
     CORSMiddleware,
@@ -50,6 +50,15 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def add_no_cache_headers(request, call_next):
+    response = await call_next(request)
+    # Prevent aggressive browser caching of static JS/CSS and API responses during development
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 
 # ---------------------------------------------------------
