@@ -80,10 +80,16 @@ def root():
 if FRONTEND_DIR.exists():
     css_dir = FRONTEND_DIR / "css"
     js_dir = FRONTEND_DIR / "js"
+    img_dir = FRONTEND_DIR / "img"
+    assets_dir = FRONTEND_DIR / "assets"
     if css_dir.exists():
         app.mount("/css", StaticFiles(directory=str(css_dir)), name="css")
     if js_dir.exists():
         app.mount("/js", StaticFiles(directory=str(js_dir)), name="js")
+    if img_dir.exists():
+        app.mount("/img", StaticFiles(directory=str(img_dir)), name="img")
+    if assets_dir.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_dir)), name="assets")
 
 
 @app.get("/api/auth/users", response_model=List[UserRead], tags=["Authentication"])
