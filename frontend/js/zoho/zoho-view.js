@@ -950,8 +950,9 @@ export class ZohoPreview {
 
     /**
      * Zoho HR Admin Training & Certification Records Grid (Exclusive to HR)
-     * Groups by unique employee so no employee is repeated, and provides
-     * a dropdown to select each specific course and view its live details.
+     * Groups by unique employee so no employee is repeated, provides
+     * course selection, administrative verification & modification with mandatory
+     * audit logging, and full audit history trail matching external dashboard.
      */
     static async renderZohoAdminGrid(viewport) {
         viewport.innerHTML = `
@@ -991,13 +992,13 @@ export class ZohoPreview {
             viewport.innerHTML = `
                 <div style="padding: 24px; max-width: 1380px; margin: 0 auto; width: 100%;">
                     <!-- Admin Header Card -->
-                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid #16a34a; border-radius: 6px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
                         <div>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <strong style="color: #166534; font-size: 0.95rem;">HR Centralized View (Zoho People Grid)</strong>
                                 <span style="background: #dcfce7; color: #15803d; font-size: 0.70rem; font-weight: 700; padding: 2px 8px; border-radius: 999px;">EXCLUSIVE HR ACCESS</span>
                             </div>
-                            <div style="font-size: 0.8rem; color: #475569; margin-top: 2px;">
+                            <div style="font-size: 0.8rem; color: #475569; margin-top: 2px;" id="zoho-header-stats-text">
                                 Total enrolled: <strong>${stats.total_assignments}</strong> assignments &bull; 
                                 Unique employees: <strong>${uniqueEmployees.length}</strong> (No duplicates) &bull; 
                                 <strong>${stats.on_risk}</strong> On-Risk alerts &bull; 
@@ -1009,17 +1010,23 @@ export class ZohoPreview {
                         </button>
                     </div>
 
-                    <!-- Training Records Table -->
+                    <!-- Main Panel with Tabs for Course Enrollments and Audit History -->
                     <div class="zoho-card" style="padding: 16px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-                            <div>
-                                <h3 style="font-size: 0.95rem; font-weight: 700; color: #1e293b;">Organization Employee Training Progress Summary</h3>
-                                <p style="font-size: 0.76rem; color: #64748b; margin-top: 2px;">
-                                    Each employee is listed once. Select any course from the dropdown to review specific certification details.
-                                </p>
+                        <!-- Navigation Header with View Tabs & Filters -->
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid #edf1f6; padding-bottom: 12px;">
+                            <!-- Tabs: Course Enrollments vs Audit History Trail -->
+                            <div style="display: flex; gap: 8px;">
+                                <button id="zoho-tab-asgn-btn" style="padding: 6px 14px; border: 1px solid #0077cc; background: #0077cc; color: #ffffff; border-radius: 4px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 150ms ease;">
+                                    📊 Course Enrollments
+                                </button>
+                                <button id="zoho-tab-audit-btn" style="padding: 6px 14px; border: 1px solid #cbd5e1; background: #ffffff; color: #475569; border-radius: 4px; font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 150ms ease;">
+                                    📜 Audit History Trail
+                                </button>
                             </div>
+
+                            <!-- Right Controls: Sync Filter & Return link -->
                             <div style="display: flex; align-items: center; gap: 14px;">
-                                <div style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #475569;">
+                                <div id="zoho-sync-filter-wrap" style="display: flex; align-items: center; gap: 6px; font-size: 0.78rem; color: #475569;">
                                     <span>Sync Course:</span>
                                     <select id="global-course-filter" style="padding: 4px 8px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.76rem; font-family: inherit; font-weight: 600; color: #1e293b; background: #f8fafc; cursor: pointer;">
                                         <option value="">Default (First Course)</option>
@@ -1032,7 +1039,8 @@ export class ZohoPreview {
                             </div>
                         </div>
 
-                        <div class="table-responsive">
+                        <!-- SECTION 1: Course Enrollments Table -->
+                        <div id="zoho-section-enrollments" class="table-responsive">
                             <table class="data-table">
                                 <thead>
                                     <tr>
@@ -1046,6 +1054,7 @@ export class ZohoPreview {
                                         <th>Week 1</th>
                                         <th>Week 2</th>
                                         <th>Latest Comments</th>
+                                        <th style="text-align: center;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="zoho-admin-grid-tbody">
@@ -1088,11 +1097,121 @@ export class ZohoPreview {
                                                 <td class="cell-comments" style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                                     <!-- Filled dynamically -->
                                                 </td>
+                                                <td class="cell-actions" style="text-align: center;">
+                                                    <button class="btn-zoho-verify-edit" data-emp-id="${empId}" data-asgn-id="${firstAsgn.id}" style="background: #ffffff; border: 1px solid #0077cc; color: #0077cc; padding: 4px 10px; border-radius: 4px; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 150ms ease;">
+                                                        ✏️ Verify / Edit
+                                                    </button>
+                                                </td>
                                             </tr>
                                         `;
                                     }).join("")}
                                 </tbody>
                             </table>
+                        </div>
+
+                        <!-- SECTION 2: Audit History Trail Table (Section 3.2 & 5.4) -->
+                        <div id="zoho-section-audit" class="table-responsive hidden">
+                            <div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+                                <div style="font-size: 0.82rem; color: #475569;">
+                                    Tracks all administrative changes, before/after values, timestamps, and mandatory modification reasons.
+                                </div>
+                                <button id="btn-refresh-zoho-audit" style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #334155; padding: 4px 10px; border-radius: 4px; font-size: 0.74rem; font-weight: 600; cursor: pointer;">
+                                    🔄 Refresh Audit Log
+                                </button>
+                            </div>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Timestamp</th>
+                                        <th>Admin Identity</th>
+                                        <th>Assignment ID</th>
+                                        <th>Field Modified</th>
+                                        <th>Original Value</th>
+                                        <th>Updated Value</th>
+                                        <th>Modification Reason</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="zoho-admin-audit-tbody">
+                                    <tr><td colspan="7" style="text-align: center; padding: 2rem; color: #64748b;">Loading audit trail...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ZOHO ADMINISTRATIVE VERIFICATION & AUDIT MODAL -->
+                    <div id="zoho-admin-audit-modal" class="zoho-modal-backdrop hidden">
+                        <div class="zoho-modal-card">
+                            <div class="zoho-modal-header">
+                                <div>
+                                    <div class="zoho-modal-title">Administrative Verification & Modification</div>
+                                    <div style="font-size: 0.75rem; color: #cbd5e1; margin-top: 2px;" id="zoho-audit-modal-subtitle">
+                                        Editing record
+                                    </div>
+                                </div>
+                                <button type="button" class="zoho-modal-close-btn" id="zoho-audit-modal-close">&times;</button>
+                            </div>
+                            <form id="zoho-admin-audit-form">
+                                <div class="zoho-modal-body">
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-size: 0.82rem; font-weight: 600; color: #334155; margin-bottom: 4px; display: block;">Course Progress Status</label>
+                                            <select id="zoho-edit-course-status" class="form-select" style="width: 100%; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; font-family: inherit;">
+                                                <option value="Not Started">Not Started</option>
+                                                <option value="In Progress">In Progress</option>
+                                                <option value="Completed">Completed</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-size: 0.82rem; font-weight: 600; color: #334155; margin-bottom: 4px; display: block;">Progress Percentage (%)</label>
+                                            <input type="number" id="zoho-edit-progress-pct" class="form-input" min="0" max="100" style="width: 100%; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; font-family: inherit;" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Overall Administrative Status (Section 7.2) -->
+                                    <div class="form-group" style="margin-bottom: 12px;">
+                                        <label class="form-label" style="font-size: 0.82rem; font-weight: 600; color: #334155; margin-bottom: 4px; display: block;">Overall Administrative Status</label>
+                                        <select id="zoho-edit-admin-status" class="form-select" style="width: 100%; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; font-family: inherit;">
+                                            <option value="In Progress">In Progress</option>
+                                            <option value="On Risk">⚠️ On Risk (Needs attention)</option>
+                                            <option value="Certified">Certified</option>
+                                        </select>
+                                    </div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-size: 0.82rem; font-weight: 600; color: #334155; margin-bottom: 4px; display: block;">Planned Exam Date</label>
+                                            <input type="date" id="zoho-edit-exam-date" class="form-input" style="width: 100%; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; font-family: inherit;" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" style="font-size: 0.82rem; font-weight: 600; color: #334155; margin-bottom: 4px; display: block;">Certified Date</label>
+                                            <input type="date" id="zoho-edit-cert-date" class="form-input" style="width: 100%; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; font-family: inherit;" />
+                                        </div>
+                                    </div>
+
+                                    <!-- Mandatory Audit Rationale (Section 3.2 & 5.4) -->
+                                    <div class="form-group" style="background: #f8fafc; padding: 12px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 12px;">
+                                        <label class="form-label" style="font-size: 0.82rem; font-weight: 700; color: #0f172a; margin-bottom: 4px; display: block;">
+                                            Modification Reason & Audit Note <span style="color: #ef4444;">*</span>
+                                        </label>
+                                        <textarea 
+                                            id="zoho-edit-audit-reason" 
+                                            rows="2" 
+                                            class="form-textarea" 
+                                            placeholder="Explain why this administrative change is being recorded in Zoho People..." 
+                                            style="width: 100%; padding: 7px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 0.85rem; font-family: inherit; resize: vertical;"
+                                            required
+                                        ></textarea>
+                                        <div style="font-size: 0.72rem; color: #64748b; margin-top: 4px;">
+                                            Audited under HR Admin: <strong>Sarah Jenkins (HR001)</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="zoho-modal-footer">
+                                    <button type="button" class="zoho-btn-cancel" id="zoho-audit-modal-cancel">Cancel</button>
+                                    <button type="submit" class="zoho-btn-save">Save & Audit Record</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -1101,6 +1220,12 @@ export class ZohoPreview {
             // Helper to update a row's details for a given assignment
             const updateRowForAssignment = (rowEl, asgn) => {
                 if (!rowEl || !asgn) return;
+
+                // Update the Verify/Edit button's target assignment id
+                const btnEdit = rowEl.querySelector(".btn-zoho-verify-edit");
+                if (btnEdit) {
+                    btnEdit.setAttribute("data-asgn-id", asgn.id);
+                }
 
                 // 1. Progress
                 const cellProgress = rowEl.querySelector(".cell-progress");
@@ -1221,6 +1346,193 @@ export class ZohoPreview {
                         }
                     });
                 });
+            }
+
+            // Function to load and render Zoho Audit Logs table
+            const loadZohoAuditLogs = async () => {
+                const tbody = viewport.querySelector("#zoho-admin-audit-tbody");
+                try {
+                    const logs = await ApiService.getAuditLogs();
+                    if (!logs || logs.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 2rem; color: #64748b;">No administrative modifications logged yet.</td></tr>`;
+                        return;
+                    }
+
+                    tbody.innerHTML = logs.map(l => `
+                        <tr>
+                            <td style="font-size: 0.78rem; color: #64748b; white-space: nowrap;">${new Date(l.timestamp).toLocaleString()}</td>
+                            <td>
+                                <strong>${l.administrator_name}</strong>
+                                <span style="font-size: 0.72rem; color: #64748b; display: block;">(${l.administrator_id})</span>
+                            </td>
+                            <td><code>#${l.assignment_id}</code></td>
+                            <td><span style="font-family: monospace; font-size: 0.78rem; background: #f1f5f9; padding: 2px 6px; border-radius: 3px;">${l.field_name}</span></td>
+                            <td><span style="color: #64748b; text-decoration: line-through;">${l.original_value !== null && l.original_value !== undefined ? l.original_value : 'None'}</span></td>
+                            <td><strong style="color: #0077cc;">${l.updated_value !== null && l.updated_value !== undefined ? l.updated_value : 'None'}</strong></td>
+                            <td style="max-width: 250px; font-size: 0.8rem; color: #334155;">${l.reason || '-'}</td>
+                        </tr>
+                    `).join("");
+                } catch (err) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 2rem;">Failed to fetch audit records.</td></tr>`;
+                }
+            };
+
+            // Tab switching: Course Enrollments vs Audit History Trail
+            const tabBtnAsgn = viewport.querySelector("#zoho-tab-asgn-btn");
+            const tabBtnAudit = viewport.querySelector("#zoho-tab-audit-btn");
+            const secEnrollments = viewport.querySelector("#zoho-section-enrollments");
+            const secAudit = viewport.querySelector("#zoho-section-audit");
+            const syncFilterWrap = viewport.querySelector("#zoho-sync-filter-wrap");
+
+            tabBtnAsgn.addEventListener("click", () => {
+                tabBtnAsgn.style.background = "#0077cc";
+                tabBtnAsgn.style.borderColor = "#0077cc";
+                tabBtnAsgn.style.color = "#ffffff";
+
+                tabBtnAudit.style.background = "#ffffff";
+                tabBtnAudit.style.borderColor = "#cbd5e1";
+                tabBtnAudit.style.color = "#475569";
+
+                secEnrollments.classList.remove("hidden");
+                secAudit.classList.add("hidden");
+                syncFilterWrap.style.display = "flex";
+            });
+
+            tabBtnAudit.addEventListener("click", () => {
+                tabBtnAudit.style.background = "#0077cc";
+                tabBtnAudit.style.borderColor = "#0077cc";
+                tabBtnAudit.style.color = "#ffffff";
+
+                tabBtnAsgn.style.background = "#ffffff";
+                tabBtnAsgn.style.borderColor = "#cbd5e1";
+                tabBtnAsgn.style.color = "#475569";
+
+                secEnrollments.classList.add("hidden");
+                secAudit.classList.remove("hidden");
+                syncFilterWrap.style.display = "none";
+                loadZohoAuditLogs();
+            });
+
+            const btnRefreshAudit = viewport.querySelector("#btn-refresh-zoho-audit");
+            if (btnRefreshAudit) {
+                btnRefreshAudit.addEventListener("click", () => {
+                    loadZohoAuditLogs();
+                    store.showToast("Refreshed audit log history.", "info");
+                });
+            }
+
+            // MODAL LOGIC: Setup Verify / Edit Modal
+            const auditModal = viewport.querySelector("#zoho-admin-audit-modal");
+            const auditModalClose = viewport.querySelector("#zoho-audit-modal-close");
+            const auditModalCancel = viewport.querySelector("#zoho-audit-modal-cancel");
+            const auditSubtitle = viewport.querySelector("#zoho-audit-modal-subtitle");
+            const auditForm = viewport.querySelector("#zoho-admin-audit-form");
+
+            const closeAuditModal = () => auditModal.classList.add("hidden");
+            if (auditModalClose) auditModalClose.addEventListener("click", closeAuditModal);
+            if (auditModalCancel) auditModalCancel.addEventListener("click", closeAuditModal);
+            auditModal.addEventListener("click", (e) => {
+                if (e.target === auditModal) closeAuditModal();
+            });
+
+            let currentEditingAssignment = null;
+            let currentEditingRow = null;
+
+            // Wire up all "Verify / Edit" buttons
+            const verifyBtns = viewport.querySelectorAll(".btn-zoho-verify-edit");
+            verifyBtns.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const asgnId = parseInt(btn.getAttribute("data-asgn-id"));
+                    const empId = btn.getAttribute("data-emp-id");
+                    const empData = employeeMap.get(empId);
+                    if (!empData) return;
+
+                    const asgn = empData.assignments.find(a => a.id === asgnId);
+                    if (!asgn) return;
+
+                    currentEditingAssignment = asgn;
+                    currentEditingRow = viewport.querySelector(`#row-emp-${empId}`);
+
+                    // Fill modal form fields
+                    auditSubtitle.textContent = `Editing: ${empData.employee.name} (${asgn.course ? asgn.course.course_code : 'Course'})`;
+                    viewport.querySelector("#zoho-edit-course-status").value = asgn.course_status || "In Progress";
+                    viewport.querySelector("#zoho-edit-progress-pct").value = asgn.progress_percentage !== undefined ? asgn.progress_percentage : 0;
+                    viewport.querySelector("#zoho-edit-admin-status").value = asgn.admin_status || "In Progress";
+                    viewport.querySelector("#zoho-edit-exam-date").value = asgn.exam_date || "";
+                    viewport.querySelector("#zoho-edit-cert-date").value = asgn.certified_date || "";
+                    viewport.querySelector("#zoho-edit-audit-reason").value = "";
+
+                    auditModal.classList.remove("hidden");
+                });
+            });
+
+            // Form submission for administrative modification
+            if (auditForm) {
+                auditForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    if (!currentEditingAssignment) return;
+
+                    const reason = viewport.querySelector("#zoho-edit-audit-reason").value.trim();
+                    if (!reason) {
+                        store.showToast("Please provide a reason for the audit trail.", "error");
+                        return;
+                    }
+
+                    const newCourseStatus = viewport.querySelector("#zoho-edit-course-status").value;
+                    const newProgress = parseInt(viewport.querySelector("#zoho-edit-progress-pct").value);
+                    const newAdminStatus = viewport.querySelector("#zoho-edit-admin-status").value;
+                    const newExamDate = viewport.querySelector("#zoho-edit-exam-date").value || null;
+                    const newCertDate = viewport.querySelector("#zoho-edit-cert-date").value || null;
+
+                    try {
+                        const updated = await ApiService.modifyAssignment(currentEditingAssignment.id, {
+                            course_status: newCourseStatus,
+                            progress_percentage: newProgress,
+                            admin_status: newAdminStatus,
+                            exam_date: newExamDate,
+                            certified_date: newCertDate,
+                            administrator_id: "HR001",
+                            administrator_name: "Sarah Jenkins",
+                            reason: reason
+                        });
+
+                        // Update local assignment record
+                        Object.assign(currentEditingAssignment, updated);
+
+                        // Update UI row in-place
+                        if (currentEditingRow) {
+                            updateRowForAssignment(currentEditingRow, currentEditingAssignment);
+
+                            // Update the select option text with new percentage
+                            const sel = currentEditingRow.querySelector(".zoho-table-course-select");
+                            if (sel) {
+                                const opt = sel.querySelector(`option[value="${currentEditingAssignment.id}"]`);
+                                if (opt) {
+                                    opt.textContent = `${currentEditingAssignment.course ? currentEditingAssignment.course.course_code : 'Course'} - ${currentEditingAssignment.course ? currentEditingAssignment.course.course_name : currentEditingAssignment.certification_name} (${currentEditingAssignment.progress_percentage}%)`;
+                                }
+                            }
+                        }
+
+                        // Refresh header stats count
+                        const updatedStats = await ApiService.getAdminDashboard();
+                        const statsEl = viewport.querySelector("#zoho-header-stats-text");
+                        if (statsEl) {
+                            statsEl.innerHTML = `
+                                Total enrolled: <strong>${updatedStats.total_assignments}</strong> assignments &bull; 
+                                Unique employees: <strong>${uniqueEmployees.length}</strong> (No duplicates) &bull; 
+                                <strong>${updatedStats.on_risk}</strong> On-Risk alerts &bull; 
+                                <strong>${updatedStats.certified}</strong> Certified
+                            `;
+                        }
+
+                        store.showToast("Assignment record updated and logged to audit trail!", "success");
+                        closeAuditModal();
+
+                        // If audit tab is opened later, it will fetch fresh logs
+                    } catch (err) {
+                        store.showToast(err.message, "error");
+                    }
+                };
             }
 
             viewport.querySelector("#zoho-btn-excel").addEventListener("click", () => {

@@ -1122,6 +1122,16 @@
     box-shadow: 0 0 0 2px rgba(0, 119, 204, 0.2);
 }
 
+.btn-zoho-verify-edit:hover {
+    background: #0077cc !important;
+    color: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0, 119, 204, 0.3);
+}
+
+.btn-zoho-verify-edit:active {
+    transform: translateY(1px);
+}
+
 /* Responsive adjustments */
 @media (max-width: 900px) {
     .zoho-dashboard-grid {
