@@ -376,7 +376,7 @@ export class ExternalAdminView {
             const groups = [];
             for (const log of logs) {
                 const timeMs = new Date(log.timestamp).getTime();
-                let existing = groups.find(g => 
+                let existing = groups.find(g =>
                     g.assignment_id === log.assignment_id &&
                     g.administrator_id === log.administrator_id &&
                     g.reason === log.reason &&

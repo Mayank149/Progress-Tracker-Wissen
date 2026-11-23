@@ -82,7 +82,7 @@ class App {
      */
     static handleStateChange(state) {
         const currentUserId = state.currentUser ? state.currentUser.id : null;
-        
+
         // If view and user identity have not changed, DO NOT re-render!
         if (this.lastView === state.currentDemoView && this.lastUserId === currentUserId) {
             return;

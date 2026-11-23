@@ -1,78 +1,130 @@
-# Employee Course Progress Management System
+# Employee Course Progress & Certification Tracker
 
-A centralized system for employee learning progress, course assignments, examination tracking, and certification records designed to replace manual Excel-based tracking.
-
----
-
-## Architecture Overview
-
-This project includes **two implementations demonstrated in a single unified interface**:
-
-1. **🏢 Zoho-Native Solution:**
-   * Embedded inside the Zoho People / Zoho Creator ecosystem.
-   * Seamless pre-authenticated context (no separate login page).
-   * Direct employee self-service progress update forms and HR administration grid.
-
-2. **🌐 External Web Dashboard:**
-   * Modern corporate full-stack web application.
-   * Standalone authentication (supporting Company SSO / Role selection between Employee and HR Admin).
-   * Dedicated Employee Portal (KPI cards, progress bars, Track My Progress modal).
-   * Dedicated HR Admin Portal (KPI overview, On-Risk alert monitoring, duplicate course assignment prevention, mandatory audit-logged modifications, and Excel export).
+An enterprise-grade training and certification governance platform designed to replace fragile, manual spreadsheets with real-time progress tracking, audit trails, and automated risk detection.
 
 ---
 
-## Technology Stack
+## 30-Second Summary
 
-* **Backend:** Python 3.12 + FastAPI + SQLite (SQLAlchemy ORM) + Pydantic v2 + Pandas & Openpyxl.
-* **Frontend:** Vanilla HTML5, CSS3, and Modular Modern JavaScript (ES6 Modules) with zero npm build dependencies.
-* **Database:** SQLite (stored at `backend/progress_tracker.db`), easily swappable for production PostgreSQL.
+- **The Problem:** Tracking employee technical certifications across teams using disconnected Excel files leads to stale progress, missed exam deadlines, duplicate assignments, and zero audit visibility.
+- **The Solution:** A unified system that provides role-based self-service for employees, centralized oversight for HR/Managers, proactive **"On-Risk"** alerts for lagging candidates, and tamper-evident audit logging for administrative edits.
+- **Dual-Preview Architecture:** The system ships with a live preview toggle comparing two deployment paradigms side-by-side:
+  1. **External Corporate Web App:** A standalone, responsive portal with persona-based login, metric KPI cards, and comprehensive administrative controls.
+  2. **Zoho People Native Simulation:** An embedded, low-friction integration mirroring the Zoho People workspace with zero-auth overhead.
 
 ---
 
-## How to Run
+## Quick Start (Under 1 Minute)
 
-### Step 1: Start the Backend Server
-
-From the project root directory, run:
+### 1. Start Backend & API
+From the repository root, start the FastAPI server:
 
 ```bash
 python -m uvicorn app.main:app --app-dir backend --reload --port 8000
 ```
 
-### Step 2: Open the Application in your Browser
+### 2. Access the Application
+Open your browser and navigate to:
+**[http://localhost:8000](http://localhost:8000)**
 
-Simply open your browser and navigate to:
-
-👉 **[http://127.0.0.1:8000/](http://127.0.0.1:8000/)**
-
-*(Or alternatively, you can directly open `frontend/index.html` in Chrome/Edge)*
+*(The FastAPI server automatically serves the frontend at the root URL with all API endpoints mounted under `/api/`)*
 
 ---
 
-## Demo Features to Test
+## System Walkthrough & Key Features
 
-### 1. Toggle Switcher (Top Bar)
-* Click **"Zoho Preview"** to view the Zoho-native interface.
-* Click **"External Dashboard"** to view the standalone corporate web application.
+### 1. Persona-Based Corporate Authentication
+Seamlessly switch between sample learner and administrator personas to explore role-specific permissions and views without setup overhead.
 
-### 2. External Dashboard Authentication
-* Use the quick 1-click test personas on the login page:
-  * **Alex Morgan (`EMP101`)**: Employee in Data Engineering (In Progress on `COF-C03`).
-  * **David Chen (`EMP102`)**: Employee in Cloud Architecture (Completed & Certified on `COF-C03`).
-  * **Elena Rostova (`EMP103`)**: Employee in AI/ML (Stalled at 25% with exam scheduled in 5 days &bull; **⚠️ On Risk**).
-  * **Sarah Jenkins (`HR001`)**: HR Administrator with full administrative controls.
+![Corporate Portal Login](frontend/img/01-login-portal.png)
 
-### 3. Employee Portal
-* Click **"Track My Progress"**.
-* Select a course and update progress.
-* Notice business rule enforcement:
-  * *Not Started* locks progress to `0%`.
-  * *In Progress* requires `1%` to `99%`.
-  * *Completed* automatically locks progress to `100%`.
-* Submissions automatically record submission timestamps and append to `progress_history`.
+---
 
-### 4. HR Admin Portal
-* **On-Risk Monitoring:** Review employees flagged as "On Risk".
-* **Assign Course:** Assign a new course to an employee. Notice that assigning a course already assigned to that employee is automatically blocked with duplicate prevention.
-* **Verify & Edit Record:** Modify progress or dates. Notice that providing a **Modification Reason** is mandatory, and every change is recorded in the **Audit History Trail** with old value, new value, admin identity, and timestamp.
-* **Export to Excel:** Click **"Export to Excel"** to download an `.xlsx` spreadsheet matching the original schema (retaining Week 1 and Week 2 columns).
+### 2. Employee Learning Dashboard
+Learners can track assigned certifications, review target exam deadlines, and submit real-time milestone updates.
+
+![Employee Learning Dashboard](frontend/img/02-external-employee-dashboard.png)
+
+* **Business-Rule Validation:**
+  - *Not Started* locks progress to `0%`.
+  - *In Progress* requires valid completion values (`1%` to `99%`).
+  - *Completed* automatically locks progress to `100%` and prompts for exam/certification verification.
+* **Submission History:** Every employee submission appends a timestamped progress snapshot to their audit trail.
+
+---
+
+### 3. HR Administration & Roster Management
+HR managers monitor enterprise-wide training health with high-level KPI metrics, candidate status tracking, and duplicate prevention.
+
+![HR Course Enrollments](frontend/img/03-external-admin-enrollments.png)
+
+* **Deduplicated Employee Roster:** Each employee appears on a clean single row with an interactive in-grid course dropdown switcher for multi-course assignees.
+* **Automated Risk Flags:** Candidates with upcoming exams but insufficient progress are automatically tagged with high-visibility **On Risk** status badges.
+* **Duplicate Assignment Guard:** Attempting to assign an existing course to an employee is blocked at both client and database levels.
+* **Excel Synchronization:** One-click download of a structured `.xlsx` spreadsheet matching corporate reporting formats.
+
+---
+
+### 4. Administrative Audit History Trail
+Every administrative adjustment requires an explicit business justification and is recorded immutably with full attribution.
+
+![Administrative Audit History Trail](frontend/img/04-external-admin-audit-trail.png)
+
+* **Grouped Event Logs:** Multi-field edits are consolidated into a single readable event row showing previous vs. updated values.
+* **Accountability:** Captures administrator identity, timestamp, assignment ID, and mandatory change rationale.
+
+---
+
+### 5. Zoho People Ecosystem Simulation
+Experience how the training tracker natively integrates within Zoho People's familiar employee and HR spaces.
+
+| Employee Self-Service Space | HR Centralized Management Grid |
+| :---: | :---: |
+| ![Zoho Employee Space](frontend/img/05-zoho-employee-activities.png) | ![Zoho HR Centralized Grid](frontend/img/06-zoho-hr-centralized-grid.png) |
+| Direct progress self-reporting inside Zoho Activities feed | Centralized grid with course switchers, status badges, and audit history |
+
+---
+
+## Demo Test Personas
+
+Quickly test the system using pre-configured test profiles available directly on the login screen:
+
+| Persona | Role | Department | Key Scenario to Test |
+| :--- | :--- | :--- | :--- |
+| **Alex Morgan** (`EMP101`) | Employee | Data Engineering | Active learner (`COF-C03` Snowflake, 25% complete). |
+| **David Chen** (`EMP102`) | Employee | Cloud Architecture | Certified professional (`COF-C03` Snowflake, 100% Certified). |
+| **Elena Rostova** (`EMP103`) | Employee | AI / Machine Learning | **On Risk** candidate (exam in under 5 days, progress at 25%). |
+| **Marcus Vance** (`EMP104`) | Employee | Enterprise Systems | Multi-course enrollee testing course switching & status changes. |
+| **Sarah Jenkins** (`HR001`) | HR Admin | People Operations | Full administrative access: course assignment, record edits, audit review, and Excel export. |
+
+---
+
+## Architecture & Technology Stack
+
+```
+Progress tracker/
+├── backend/
+│   ├── app/
+│   │   ├── main.py              # FastAPI application & static file mounting
+│   │   ├── database.py          # SQLAlchemy engine & session setup
+│   │   ├── models.py            # SQLite database models (Employee, Course, Assignment, AuditLog)
+│   │   ├── schemas.py           # Pydantic v2 validation schemas
+│   │   ├── seed_data.py         # Initial mock dataset and business scenario seeding
+│   │   └── routers/
+│   │       ├── employee.py      # Employee-facing REST API endpoints
+│   │       └── admin.py         # HR admin REST API endpoints & Excel export
+│   └── progress_tracker.db      # Local SQLite database
+└── frontend/
+    ├── index.html               # Single-page shell with top-level preview switcher
+    ├── css/                     # Modern modular styling
+    ├── img/                     # Renamed application screenshot assets
+    └── js/
+        ├── app.js               # Application coordinator & state diffing
+        ├── state.js             # Client state management
+        ├── external/            # Standalone corporate portal views (login, employee, admin)
+        └── zoho/                # Zoho People ecosystem simulation views
+```
+
+* **Backend:** Python 3.12, FastAPI, SQLAlchemy ORM, Pydantic v2, Pandas, Openpyxl.
+* **Frontend:** Modern Vanilla ES6 JavaScript Modules, HTML5, CSS3 (Zero build step, zero npm runtime dependencies).
+* **Storage:** SQLite (Production-ready schema seamlessly portable to PostgreSQL).

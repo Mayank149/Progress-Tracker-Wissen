@@ -347,15 +347,15 @@ export class ZohoPreview {
         personaSelect.addEventListener("change", async (e) => {
             const newEmpId = e.target.value;
             const isNowHr = newEmpId === "HR001";
-            
+
             // If switching from HR to normal employee while on admin tab, switch back to activities
             if (!isNowHr && store.getState().zohoActiveTab === "admin") {
                 store.setState({ zohoActiveTab: "activities" });
             }
-            
+
             store.setState({ zohoActiveEmployee: newEmpId });
             store.showToast(`Switched active Zoho persona to ${newEmpId} (${isNowHr ? 'HR Administrator' : 'Employee'})`, "info");
-            
+
             // Re-render shell to sync navigation labels and access permissions
             await this.render(container);
         });
@@ -548,8 +548,8 @@ export class ZohoPreview {
                             <h4 class="zoho-dept-title">Department Members</h4>
                             <div class="zoho-dept-list">
                                 ${colleagues.map(colleague => {
-                                    const colInitials = colleague.name.split(" ").map(p => p[0]).join("").toUpperCase();
-                                    return `
+                const colInitials = colleague.name.split(" ").map(p => p[0]).join("").toUpperCase();
+                return `
                                         <div class="zoho-dept-item">
                                             <div class="zoho-dept-avatar">${colInitials}</div>
                                             <div class="zoho-dept-info">
@@ -558,7 +558,7 @@ export class ZohoPreview {
                                             </div>
                                         </div>
                                     `;
-                                }).join("")}
+            }).join("")}
                             </div>
                             <div class="zoho-dept-more">
                                 <a href="#" id="btn-dept-more">+2374 More</a>
@@ -665,9 +665,9 @@ export class ZohoPreview {
 
                             <!-- 2. Assigned certification courses from backend database (Multiple courses per employee!) -->
                             ${courses.map(c => {
-                                const statusClass = (c.course_status || "Not Started").toLowerCase().replace(" ", "-");
-                                const isComplete = c.course_status === "Completed";
-                                return `
+                const statusClass = (c.course_status || "Not Started").toLowerCase().replace(" ", "-");
+                const isComplete = c.course_status === "Completed";
+                return `
                                     <div class="zoho-session-card">
                                         <div class="zoho-session-left">
                                             <div class="zoho-session-icon">
@@ -710,7 +710,7 @@ export class ZohoPreview {
                                         </div>
                                     </div>
                                 `;
-                            }).join("")}
+            }).join("")}
 
                             <!-- 3. Additional batch session card matching the layout in the screenshot -->
                             <div class="zoho-session-card">
@@ -1059,11 +1059,11 @@ export class ZohoPreview {
                                 </thead>
                                 <tbody id="zoho-admin-grid-tbody">
                                     ${uniqueEmployees.map(empData => {
-                                        const emp = empData.employee;
-                                        const empId = emp ? emp.employee_id : "";
-                                        const firstAsgn = empData.assignments[0];
+                const emp = empData.employee;
+                const empId = emp ? emp.employee_id : "";
+                const firstAsgn = empData.assignments[0];
 
-                                        return `
+                return `
                                             <tr id="row-emp-${empId}" data-emp-id="${empId}">
                                                 <td><code>${empId}</code></td>
                                                 <td><strong>${emp ? emp.name : ''}</strong></td>
@@ -1104,7 +1104,7 @@ export class ZohoPreview {
                                                 </td>
                                             </tr>
                                         `;
-                                    }).join("")}
+            }).join("")}
                                 </tbody>
                             </table>
                         </div>
@@ -1360,7 +1360,7 @@ export class ZohoPreview {
                     const groups = [];
                     for (const log of logs) {
                         const timeMs = new Date(log.timestamp).getTime();
-                        let existing = groups.find(g => 
+                        let existing = groups.find(g =>
                             g.assignment_id === log.assignment_id &&
                             g.administrator_id === log.administrator_id &&
                             g.reason === log.reason &&
